@@ -44,10 +44,6 @@ class KnightPathFinder
         string.split(",").map { |char| Integer(char) }
     end
 
-    def build_move_tree
-
-    end
-
     def new_move_positions(pos)
         new_moves = []
 
@@ -64,6 +60,24 @@ class KnightPathFinder
         @considered_positions += new_moves
 
         return new_moves
+    end
+
+    def build_move_tree(target)
+        queue = []
+        queue << starting_position
+
+        until queue == []
+            #pop the first item from the queue for processing
+            result = queue.shift
+            if result != target
+                new_move_positions(result).each do |position|
+                    queue << position
+                end
+            else
+                return result
+            end
+        end
+        return nil
     end
 
 end
