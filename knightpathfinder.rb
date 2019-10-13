@@ -3,12 +3,13 @@ require_relative 'polytreenode.rb'
 class KnightPathFinder
     attr_accessor :considered_positions, :root_node
 
-    def initialize(starting_position)
+    def initialize(starting_position, target_position)
         @starting_position = starting_position
+        @target_position = target_position
         @size = 8
         @root_node = PolyTreeNode.new(starting_position)
-        build_move_tree
-        @considered_positions = [@starting_position]
+        @considered_positions = [@root_node]
+        # build_move_tree(starting_position, target_position)
     end
 
     def self.valid_moves(pos)
@@ -45,39 +46,25 @@ class KnightPathFinder
     end
 
     def new_move_positions(pos)
-        new_moves = []
-
         new_nodes = self.class.valid_moves(pos)
 
+        new_nodes.select! do |move|
+            @considered_positions.include?(move.value) == false
+        end
+
         new_nodes.each do |node|
-            new_moves << node.value
+            @considered_positions << node
         end
 
-        new_moves.select! do |move|
-            @considered_positions.include?(move) == false
-        end
-
-        @considered_positions += new_moves
-
-        return new_moves
+        return new_nodes
     end
 
-    def build_move_tree(target)
-        queue = []
-        queue << starting_position
-
-        until queue == []
-            #pop the first item from the queue for processing
-            result = queue.shift
-            if result != target
-                new_move_positions(result).each do |position|
-                    queue << position
-                end
-            else
-                return result
-            end
+    def build_move_tree(start=@root_node)
+        new_move_positions(@starting_position).each do |node|
+            start.children << node
         end
-        return nil
+
+        return start
     end
 
 end
